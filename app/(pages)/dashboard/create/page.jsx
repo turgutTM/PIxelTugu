@@ -5,7 +5,6 @@ import { IoIosInformationCircleOutline } from "react-icons/io";
 import { useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
 import { FaArrowRotateLeft, FaArrowRotateRight } from "react-icons/fa6";
-
 const DEFAULT_COLOR = "#FFFFFF";
 const BRUSH_ICON = "🖌️";
 const ERASER_ICON = "🩹";
@@ -29,8 +28,7 @@ const CATEGORY_OPTIONS = [
   "nature",
   "monthly art",
 ];
-const CANVAS_SIZES = [50, 100, 150, 200];
-
+const CANVAS_SIZES = [50, 100, 150];
 export default function PixelArtDrawingPage() {
   const user = useSelector((state) => state.user.user);
   const searchParams = useSearchParams();
@@ -207,8 +205,8 @@ export default function PixelArtDrawingPage() {
         <p className="max-w-xl mx-auto">
           Click or drag over the squares to create your own pixel art! Use the
           brush or eraser, and choose from the palette to add color.
-          <span className="text-gray-400 flex items-start">
-            <IoIosInformationCircleOutline size={27} /> The pixel area may be
+          <span className="text-gray-400 flex items-center mt-3 gap-1">
+            <IoIosInformationCircleOutline size={17} /> The pixel area may be
             harmful to your eye health if you look at it for too long.
           </span>
         </p>
@@ -220,8 +218,8 @@ export default function PixelArtDrawingPage() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Title"
-            maxLength={30}
-            className="font-bold text-4xl text-start border-none text-white focus:outline-none bg-transparent px-3 py-2 rounded-md w-[40rem]"
+            maxLength={40}
+            className="font-bold text-4xl text-start border-none text-white focus:outline-none bg-transparent px-3 py-2 rounded-md w-[50rem]"
           />
         </div>
         <div className="relative inline-block">
@@ -263,7 +261,7 @@ export default function PixelArtDrawingPage() {
           className="bg-gray-800 text-white px-3 py-2 rounded-md"
         >{`Canvas Size: ${canvasSize}`}</button>
         {isCanvasMenuOpen && (
-          <div className="absolute bg-gray-800 text-white rounded-md shadow-lg p-2 mt-16 z-50">
+          <div className="absolute bg-gray-800 text-white rounded-md shadow-lg p-2  z-50">
             {CANVAS_SIZES.map((size) => (
               <button
                 key={size}

@@ -10,9 +10,7 @@ const PixelArtSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   canvasSize: { type: Number, required: true },
   pixels: [PixelSchema],
-  title: {
-    type: String,
-  },
+  title: { type: String },
   category: {
     type: String,
     enum: ["romantic", "technology", "abstract", "nature", "monthly art"],
@@ -22,6 +20,14 @@ const PixelArtSchema = new mongoose.Schema({
     type: String,
     enum: ["pending", "approved", "rejected"],
     default: "pending",
+  },
+  winner: {
+    type: Boolean,
+    default: false,
+  },
+  featuredUntil: {
+    type: Date,
+    default: null,
   },
 });
 

@@ -41,9 +41,9 @@ export default function Sidebar() {
   return (
     <aside className="bg-[#242424] text-white h-screen w-16 p-4 flex flex-col justify-between items-center">
       <div className="text-2xl font-playwrite">T</div>
-      <ul className="space-y-4">
+      <ul className="space-y-4 z-50">
         {[
-          { icon: PiCoffeeBold, label: "Dashboard", href: "/dashboard/feed" },
+          { icon: PiCoffeeBold, label: "Feed", href: "/dashboard/feed" },
           {
             icon: CgProfile,
             label: "Profile",

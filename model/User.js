@@ -12,6 +12,10 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    usernameLastChangedAt: {
+      type: Date,
+      default: null,
+    },
     password: {
       type: String,
       required: true,
@@ -36,6 +40,15 @@ const UserSchema = new mongoose.Schema(
       type: String,
       default: "No Contact Info",
     },
+    followersCount: {
+      type: Number,
+      default: 0,
+    },
+    favoriteArt: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "PixelArt",
+      default: null,
+    },
     joinedAt: {
       type: String,
       default: () => new Date().toISOString(),
@@ -53,6 +66,18 @@ UserSchema.pre("save", async function (next) {
   this.password = await bcrypt.hash(this.password, salt);
   next();
 });
+
+UserSchema.methods.incrementFollowers = async function () {
+  this.followersCount += 1;
+  await this.save();
+};
+
+UserSchema.methods.decrementFollowers = async function () {
+  if (this.followersCount > 0) {
+    this.followersCount -= 1;
+    await this.save();
+  }
+};
 
 const User = mongoose.models.User || mongoose.model("User", UserSchema);
 

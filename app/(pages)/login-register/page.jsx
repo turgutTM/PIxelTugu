@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 
@@ -10,7 +10,18 @@ const LoginRegister = () => {
     email: "",
     password: "",
   });
+  const [squarePositions, setSquarePositions] = useState([]);
   const router = useRouter();
+
+  useEffect(() => {
+    setSquarePositions(
+      Array.from({ length: 40 }, () => ({
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`,
+      }))
+    );
+  }, []);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -21,32 +32,22 @@ const LoginRegister = () => {
 
   const handleSubmit = async (e, endpoint) => {
     e.preventDefault();
-
     try {
       const response = await fetch(endpoint, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-
       const data = await response.json();
-      if (!response.ok) {
-        alert(data.message || "Something went wrong");
-        return;
-      }
-
-      alert(data.message);
-      if (endpoint === "/api/login" && data.token) {
+      if (!response.ok) return;
+      if (
+        (endpoint === "/api/login" || endpoint === "/api/register") &&
+        data.token
+      ) {
         localStorage.setItem("token", data.token);
         router.push("/dashboard");
       }
-      setFormData({
-        username: "",
-        email: "",
-        password: "",
-      });
+      setFormData({ username: "", email: "", password: "" });
     } catch (error) {
       console.error("Error:", error);
       alert("An error occurred. Please try again.");
@@ -54,19 +55,15 @@ const LoginRegister = () => {
   };
 
   return (
-    <motion.div
-      className="flex items-center justify-center h-screen"
-      initial={{
-        background: isLogin ? "rgb(255, 87, 87)" : "rgb(87, 136, 255)",
-      }}
-      animate={{
-        background: isLogin
-          ? "linear-gradient(to bottom right, rgb(255, 87, 87), rgb(255, 87, 87))"
-          : "linear-gradient(to bottom right, rgb(87, 136, 255), rgb(255, 255, 255))",
-      }}
-      transition={{ duration: 0.8, ease: "easeInOut" }}
-    >
-      <div className="relative w-[350px] md:w-[600px] overflow-hidden rounded-2xl shadow-2xl bg-white p-2">
+    <motion.div className="relative flex items-center justify-center h-screen bg-red-600">
+      {squarePositions.map((pos, index) => (
+        <div
+          key={index}
+          className="absolute w-4 h-4 bg-gradient-to-br from-pixelPink to-pixelBlue rounded animate-float"
+          style={pos}
+        />
+      ))}
+      <div className="relative z-10 w-[350px] md:w-[600px] overflow-hidden rounded-2xl shadow-2xl p-2 bg-white">
         <motion.div
           className="flex w-[700px] md:w-[1200px]"
           animate={{ x: isLogin ? 0 : -590 }}
@@ -74,7 +71,7 @@ const LoginRegister = () => {
           style={{ display: "flex" }}
         >
           <div className="w-[350px] md:w-[600px] h-[500px] flex flex-col items-center justify-center px-6 py-8">
-            <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-700">
+            <h2 className="text-2xl md:text-3xl font-bold mb-6 text-pixelBlack">
               Login
             </h2>
             <form
@@ -87,7 +84,7 @@ const LoginRegister = () => {
                 placeholder="Email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className="mb-4 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="mb-4 p-3 border border-pixelBlack rounded-lg focus:outline-none focus:ring-2 focus:ring-pixelPink"
               />
               <input
                 type="password"
@@ -95,28 +92,27 @@ const LoginRegister = () => {
                 placeholder="Password"
                 value={formData.password}
                 onChange={handleInputChange}
-                className="mb-4 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="mb-4 p-3 border border-pixelBlack rounded-lg focus:outline-none focus:ring-2 focus:ring-pixelPink"
               />
               <button
                 type="submit"
-                className="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-3 rounded-lg transition"
+                className="bg-pixelPink hover:bg-pixelYellow text-pixelWhite font-semibold py-3 rounded-lg transition"
               >
                 Login
               </button>
             </form>
-            <p className="text-sm text-gray-600 mt-4">
+            <p className="text-sm text-pixelBlack mt-4">
               You have not any account yet?
               <span
                 onClick={() => setIsLogin(false)}
-                className="ml-2 text-purple-600 cursor-pointer hover:underline"
+                className="ml-2 text-pixelBlue cursor-pointer hover:underline"
               >
                 Register here.
               </span>
             </p>
           </div>
-
           <div className="w-[350px] md:w-[600px] h-[500px] flex flex-col items-center justify-center px-6 py-8">
-            <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-700">
+            <h2 className="text-2xl md:text-3xl font-bold mb-6 text-pixelBlack">
               Register
             </h2>
             <form
@@ -129,7 +125,7 @@ const LoginRegister = () => {
                 placeholder="Username"
                 value={formData.username}
                 onChange={handleInputChange}
-                className="mb-4 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+                className="mb-4 p-3 border border-pixelBlack rounded-lg focus:outline-none focus:ring-2 focus:ring-pixelGreen"
               />
               <input
                 type="email"
@@ -137,7 +133,7 @@ const LoginRegister = () => {
                 placeholder="Email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className="mb-4 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+                className="mb-4 p-3 border border-pixelBlack rounded-lg focus:outline-none focus:ring-2 focus:ring-pixelGreen"
               />
               <input
                 type="password"
@@ -145,20 +141,20 @@ const LoginRegister = () => {
                 placeholder="Password"
                 value={formData.password}
                 onChange={handleInputChange}
-                className="mb-4 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+                className="mb-4 p-3 border border-pixelBlack rounded-lg focus:outline-none focus:ring-2 focus:ring-pixelGreen"
               />
               <button
                 type="submit"
-                className="bg-pink-500 hover:bg-pink-600 text-white font-semibold py-3 rounded-lg transition"
+                className="bg-pixelGreen hover:bg-pixelYellow text-pixelWhite font-semibold py-3 rounded-lg transition"
               >
                 Register
               </button>
             </form>
-            <p className="text-sm text-gray-600 mt-4">
+            <p className="text-sm text-pixelBlack mt-4">
               Already have an account?
               <span
                 onClick={() => setIsLogin(true)}
-                className="ml-2 text-pink-600 cursor-pointer hover:underline"
+                className="ml-2 text-pixelBlue cursor-pointer hover:underline"
               >
                 Login here.
               </span>

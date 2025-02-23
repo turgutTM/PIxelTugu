@@ -1,7 +1,21 @@
-import React from "react";
+"use client";
+import React, { useEffect, useState, useRef } from "react";
 
 const Introduction = () => {
-  const squares = Array.from({ length: 40 }, (_, i) => i);
+  const videoRef = useRef(null);
+  const [squarePositions, setSquarePositions] = useState([]);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.playbackRate = 2.0;
+    }
+    setSquarePositions(
+      Array.from({ length: 40 }, () => ({
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`,
+      }))
+    );
+  }, []);
 
   return (
     <div className="relative w-full h-screen overflow-hidden z-20 bg-gradient-to-br from-red-500 to-[#1e272e] flex items-center justify-center">
@@ -13,28 +27,36 @@ const Introduction = () => {
           Create your pixel art dreams with ease! Dive into a colorful, creative
           journey.
         </p>
-
-        <button className="text-lg md:text-lg w-fit ml-3  font-mono bg-pixelPink hover:bg-pixelYellow text-pixelBlack py-2 px-5 rounded-full transition-all duration-300 shadow-pixel hover:scale-105">
+        <button className="text-lg md:text-lg w-fit ml-3 font-mono bg-pixelPink hover:bg-pixelYellow text-pixelBlack py-2 px-5 rounded-full transition-all duration-300 shadow-pixel hover:scale-105">
           Start Drawing!
         </button>
       </div>
 
       <div className="w-1/2 flex justify-center relative">
-        <div className="w-3/4 h-3/4 bg-pixelBlack border-4 border-pixelPink rounded-xl flex justify-center items-center shadow-pixel-inset">
-          <p className="text-pixelWhite text-lg">
-            Your artwork will appear here
-          </p>
+        <div
+          className="w-3/4 h-3/4  bg-pixelBlack border-4 border-pixelPink rounded-xl flex justify-center items-center shadow-pixel-inset"
+          style={{
+            transform: "perspective(800px) rotateY(-15deg)",
+            overflow: "hidden",
+          }}
+        >
+          <video
+            ref={videoRef}
+            src="/Pixelscreen.mov"
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover rounded-xl"
+          />
         </div>
       </div>
 
-      {squares.map((square) => (
+      {squarePositions.map((pos, index) => (
         <div
-          key={square}
+          key={index}
           className="absolute w-4 h-4 bg-gradient-to-br from-pixelPink to-pixelBlue rounded animate-float"
-          style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-          }}
+          style={pos}
         />
       ))}
     </div>

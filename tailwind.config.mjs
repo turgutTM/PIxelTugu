@@ -1,5 +1,7 @@
+import { withUt } from "uploadthing/tw";
+
 /** @type {import('tailwindcss').Config} */
-export default {
+export default withUt({
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -28,6 +30,7 @@ export default {
       animation: {
         float: "float 5s infinite ease-in-out",
         bouncePixel: "bouncePixel 1.5s infinite",
+        grow: "grow 1s ease-out forwards", // Yeni animasyonumuz
       },
       keyframes: {
         float: {
@@ -42,8 +45,12 @@ export default {
           "0%, 100%": { transform: "translateY(-5px)" },
           "50%": { transform: "translateY(5px)" },
         },
+        grow: {
+          "0%": { transform: "scale(0)", opacity: "0" },
+          "100%": { transform: "scale(1)", opacity: "1" },
+        },
       },
     },
   },
   plugins: [],
-};
+});

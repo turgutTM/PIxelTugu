@@ -2,14 +2,18 @@ export const fetchLikedArts = async (userId, setLikedArts, setLikeCounts) => {
   try {
     const res = await fetch(`/api/art-like?userId=${userId}`);
     if (!res.ok) throw new Error("Failed to fetch likes");
+
     const data = await res.json();
 
     const newLikedArts = {};
     const newLikeCounts = {};
 
     data.forEach((like) => {
+      // Eğer like.userId tanımlı değilse işlemi atla
+      if (!like?.userId) return;
+
       const likeUserId =
-        typeof like.userId === "object"
+        typeof like.userId === "object" && like.userId._id
           ? like.userId._id.toString()
           : like.userId;
 
@@ -17,8 +21,8 @@ export const fetchLikedArts = async (userId, setLikedArts, setLikeCounts) => {
         newLikedArts[like.pixelArtId] = true;
       }
 
-      newLikeCounts[like.pixelArtId] =
-        (newLikeCounts[like.pixelArtId] || 0) + 1;
+      newLikeCounts[like?.pixelArtId] =
+        (newLikeCounts[like?.pixelArtId] || 0) + 1;
     });
 
     setLikedArts(newLikedArts);

@@ -35,6 +35,7 @@ export async function POST(req) {
 
     const follow = new Follow({ follower: followerId, following: followingId });
     await follow.save();
+    await User.findByIdAndUpdate(followingId, { $inc: { followersCount: 1 } });
 
     return NextResponse.json(
       { message: "Followed successfully!" },
@@ -57,10 +58,19 @@ export async function DELETE(req) {
       );
     }
 
-    await Follow.findOneAndDelete({
+    const follow = await Follow.findOneAndDelete({
       follower: followerId,
       following: followingId,
     });
+
+    if (!follow) {
+      return NextResponse.json(
+        { error: "Follow relationship not found" },
+        { status: 404 }
+      );
+    }
+
+    await User.findByIdAndUpdate(followingId, { $inc: { followersCount: -1 } });
 
     return NextResponse.json(
       { message: "Unfollowed successfully!" },
@@ -86,14 +96,18 @@ export async function GET(req) {
 
     const following = await Follow.find({ follower: userId }).populate(
       "following",
-      "username"
+      "username followersCount"
     );
     const followers = await Follow.find({ following: userId }).populate(
       "follower",
-      "username"
+      "username followersCount"
     );
+    const user = await User.findById(userId).select("followersCount");
 
-    return NextResponse.json({ following, followers }, { status: 200 });
+    return NextResponse.json(
+      { following, followers, followersCount: user.followersCount },
+      { status: 200 }
+    );
   } catch (error) {
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
