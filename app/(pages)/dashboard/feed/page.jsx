@@ -12,6 +12,7 @@ import { fetchLikedArts, handleLike } from "@/app/utils/likes";
 import { getFollowingList, followUser, unfollowUser } from "@/app/utils/follow";
 import { addFavorite, removeFavorite } from "@/app/utils/save";
 import { TfiCup } from "react-icons/tfi";
+
 export default function Feed() {
   const { ref: headingRef, inView: headingVisible } = useInView({
     triggerOnce: true,
@@ -21,9 +22,6 @@ export default function Feed() {
   });
   const { ref: gridTitleRef, inView: gridTitleVisible } = useInView({
     triggerOnce: true,
-  });
-  const { ref: sentinelRef, inView: sentinelVisible } = useInView({
-    threshold: 0.1,
   });
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
   const [likedArtsFetched, setLikedArtsFetched] = useState(false);
@@ -42,7 +40,9 @@ export default function Feed() {
   const [winnerArt, setWinnerArt] = useState(null);
   const [monthlyArts, setMonthlyArts] = useState([]);
   const [currentMonthlyArtIndex, setCurrentMonthlyArtIndex] = useState(0);
+  const [showWinnerArt, setShowWinnerArt] = useState(false);
   const user = useSelector((state) => state.user.user);
+
   useEffect(() => {
     const fetchMonthly = async () => {
       try {
@@ -58,6 +58,7 @@ export default function Feed() {
     };
     fetchMonthly();
   }, []);
+
   useEffect(() => {
     if (monthlyArts.length > 1) {
       const interval = setInterval(() => {
@@ -66,6 +67,16 @@ export default function Feed() {
       return () => clearInterval(interval);
     }
   }, [monthlyArts]);
+
+  useEffect(() => {
+    if (winnerArt) {
+      const timer = setTimeout(() => {
+        setShowWinnerArt(true);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [winnerArt]);
+
   useEffect(() => {
     const fetchArtworks = async () => {
       if (!hasMore) return;
@@ -93,16 +104,14 @@ export default function Feed() {
     };
     fetchArtworks();
   }, [page]);
-  useEffect(() => {
-    if (sentinelVisible && initialLoadComplete && hasMore && !loading)
-      setPage((prev) => prev + 1);
-  }, [sentinelVisible, initialLoadComplete, hasMore, loading]);
+
   useEffect(() => {
     if (user?._id && !likedArtsFetched) {
       fetchLikedArts(user._id, setLikedArts, setLikeCounts);
       setLikedArtsFetched(true);
     }
   }, [user?._id, likedArtsFetched]);
+
   useEffect(() => {
     const loadFollowing = async () => {
       if (!user?._id) return;
@@ -111,6 +120,7 @@ export default function Feed() {
     };
     loadFollowing();
   }, [user?._id]);
+
   useEffect(() => {
     if (user?._id) {
       fetch(`/api/favorites?userId=${user._id}`)
@@ -130,11 +140,13 @@ export default function Feed() {
         .catch((err) => console.error(err));
     }
   }, [user?._id]);
+
   const handleFollow = async (followingId) => {
     if (!user?._id) return;
     await followUser(user._id, followingId);
     setFollowingUsers((prev) => ({ ...prev, [followingId]: true }));
   };
+
   const handleUnfollow = async (followingId) => {
     if (!user?._id) return;
     await unfollowUser(user._id, followingId);
@@ -144,6 +156,7 @@ export default function Feed() {
       return updated;
     });
   };
+
   const handleFavorite = (art) => {
     if (!user?._id) return;
     const artId = art._id;
@@ -165,15 +178,18 @@ export default function Feed() {
       });
     }
   };
+
   const openReportModal = (art) => {
     setReportingArt(art);
     setShowReportModal(true);
   };
+
   const closeReportModal = () => {
     setShowReportModal(false);
     setReportingArt(null);
     setReportReason("");
   };
+
   const submitReport = async () => {
     if (!user?._id || !reportingArt || !reportReason) return;
     try {
@@ -193,6 +209,7 @@ export default function Feed() {
       alert(error.message);
     }
   };
+
   const columnCount = 3;
   const rowCount = Math.ceil(artworks.length / columnCount);
   const gridWidth =
@@ -231,61 +248,80 @@ export default function Feed() {
       </div>
     );
   };
+
   return (
-    <div className="min-h-screen w-full bg-gradient-to-bl from-gray-900 via-black to-red-500 flex flex-col items-center py-10 px-4 lg:px-8">
+    <div className="min-h-screen w-full bg-gradient-to-r from-blue-900 via-purple-900 to-pink-900 flex flex-col items-center py-12 px-6">
       <div
         ref={headingRef}
-        className={`relative z-10 mt-8 text-center transition-all duration-700 ${
+        className={`relative z-10 mt-10 text-center transition-all duration-700 ${
           headingVisible
             ? "opacity-100 translate-y-0"
             : "opacity-0 translate-y-10"
         }`}
       >
-        <p className="font-fingerpaint text-white text-3xl lg:text-5xl drop-shadow-lg">
-          Art is always within you, wherever you are.
-        </p>
+        <h1 className="font-playwrite text-white text-4xl lg:text-4xl">
+          Art Within You,wherever you go
+        </h1>
       </div>
-
       <div
         ref={featuredRef}
-        className={`w-full flex flex-col gap-1 items-center mt-12 transition-all duration-700 ${
+        className={`w-full flex flex-col gap-4 items-center mt-10 transition-all duration-700 ${
           featuredVisible
             ? "opacity-100 translate-y-0"
             : "opacity-0 translate-y-10"
         }`}
       >
-        <p className="text-white flex items-center text-lg lg:text-xl uppercase font-semibold mb-4">
-          {winnerArt ? (
-            <>
-              Winner <TfiCup className="ml-2" />
-            </>
-          ) : (
-            "Art of the Month"
-          )}
-        </p>
-        <FeaturedArt
-          winnerArt={winnerArt}
-          monthlyArts={monthlyArts}
-          currentMonthlyArtIndex={currentMonthlyArtIndex}
-          onSelect={setSelectedArt}
-          user={user}
-        />
+        {winnerArt ? (
+          <div className="w-full flex flex-col items-center">
+            <p className="text-xl lg:text-2xl font-semibold mb-4 animate-colorCycle">
+              {!showWinnerArt ? "Winner is selected" : "Winner"}
+              {!showWinnerArt && (
+                <TfiCup className="inline ml-2 text-yellow-400 animate-bounce" />
+              )}
+            </p>
+            <div
+              className={`w-full max-w-md ${
+                showWinnerArt
+                  ? "transition-opacity duration-1000 opacity-100"
+                  : "opacity-0"
+              }`}
+            >
+              <FeaturedArt
+                winnerArt={winnerArt}
+                onSelect={setSelectedArt}
+                user={user}
+              />
+            </div>
+          </div>
+        ) : (
+          <>
+            <p className="text-white text-xl lg:text-2xl font-semibold mb-4">
+              Art of the Month
+            </p>
+            <FeaturedArt
+              monthlyArts={monthlyArts}
+              currentMonthlyArtIndex={currentMonthlyArtIndex}
+              onSelect={setSelectedArt}
+              user={user}
+            />
+          </>
+        )}
       </div>
       <div
         ref={gridTitleRef}
-        className={`w-full flex flex-col items-center mt-20 transition-all duration-700 ${
+        className={`w-full flex flex-col items-center mt-16 transition-all duration-700 ${
           gridTitleVisible
             ? "opacity-100 translate-y-0"
             : "opacity-0 translate-y-10"
         }`}
       >
-        <p className="text-white text-xl lg:text-2xl font-bold mb-6 drop-shadow-lg">
-          Explore what other people did
-        </p>
+        <h2 className="text-white text-2xl lg:text-3xl font-bold mb-6">
+          Explore Creations
+        </h2>
         <div style={{ height: "700px", overflowY: "auto", width: gridWidth }}>
           {loading && artworks.length === 0 ? (
             <div className="flex justify-center items-center h-full">
-              <div className="border-t-4 border-blue-500 rounded-full w-12 h-12 animate-spin"></div>
+              <div className="border-t-4 border-white rounded-full w-12 h-12 animate-spin"></div>
             </div>
           ) : (
             <Grid
@@ -301,10 +337,20 @@ export default function Feed() {
           )}
           {loading && artworks.length > 0 && (
             <div className="flex justify-center items-center mt-4">
-              <div className="border-t-4 border-blue-500 rounded-full w-8 h-8 animate-spin"></div>
+              <div className="border-t-4 border-white rounded-full w-8 h-8 animate-spin"></div>
             </div>
           )}
-          <div ref={sentinelRef}></div>
+          {!loading && hasMore && (
+            <div className="flex justify-center items-center mt-4">
+              <button
+                onClick={() => setPage((prev) => prev + 1)}
+                className="px-4 py-2 bg-white text-black rounded"
+                disabled={loading}
+              >
+                Load More
+              </button>
+            </div>
+          )}
         </div>
       </div>
       {selectedArt && (

@@ -19,6 +19,8 @@ export async function GET(req) {
 export async function POST(req) {
   await connect();
   const { userId, pixelArtId } = await req.json();
+  console.log(userId,pixelArtId);
+  
   if (!userId || !pixelArtId)
     return NextResponse.json(
       { error: "Missing required fields" },
@@ -35,6 +37,8 @@ export async function POST(req) {
 export async function DELETE(req) {
   await connect();
   const { userId, pixelArtId } = await req.json();
+  console.log(userId,pixelArtId);
+  
   if (!userId || !pixelArtId)
     return NextResponse.json(
       { error: "Missing required fields" },

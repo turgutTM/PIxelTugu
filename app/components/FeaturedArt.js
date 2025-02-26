@@ -8,23 +8,13 @@ import { fetchLikedArts, handleLike } from "@/app/utils/likes";
 import { addFavorite, removeFavorite } from "@/app/utils/save";
 import ReportModal from "@/app/utils/report";
 
-const FeaturedArt = ({
-  winnerArt,
-  monthlyArts,
-  currentMonthlyArtIndex,
-  onSelect,
-  user,
-}) => {
+const FeaturedArt = ({ winnerArt, monthlyArts, currentMonthlyArtIndex, onSelect, user }) => {
   const [likedArts, setLikedArts] = useState({});
   const [likeCounts, setLikeCounts] = useState({});
   const [favorites, setFavorites] = useState({});
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportReason, setReportReason] = useState("");
-  const artToShow = winnerArt
-    ? winnerArt
-    : monthlyArts.length > 0
-    ? monthlyArts[currentMonthlyArtIndex]
-    : null;
+  const artToShow = winnerArt ? winnerArt : monthlyArts.length > 0 ? monthlyArts[currentMonthlyArtIndex] : null;
 
   useEffect(() => {
     if (user && artToShow) {
@@ -32,54 +22,43 @@ const FeaturedArt = ({
     }
   }, [user, artToShow]);
 
+  useEffect(() => {
+    if (user?._id) {
+      fetch(`/api/favorites?userId=${user._id}`)
+        .then((res) => res.json())
+        .then((data) => {
+          const favs = {};
+          data?.favorites?.forEach((fav) => {
+            const artId = typeof fav.pixelArtId === "object" ? fav.pixelArtId._id : fav.pixelArtId;
+            favs[artId] = true;
+          });
+          setFavorites(favs);
+        })
+        .catch((err) => console.error(err));
+    }
+  }, [user]);
+
   if (!artToShow)
-    return (
-      <div className="text-gray-300 text-lg">
-        No monthly art or winner found.
-      </div>
-    );
+    return <div className="text-gray-300 text-lg">No monthly art or winner found.</div>;
 
   return (
-    <div className="w-full max-w-7xl  shadow-2xl bg-gray-900 rounded-lg overflow-hidden">
+    <div className="w-full max-w-7xl shadow-2xl bg-gray-900 rounded-lg overflow-hidden">
       <div className="p-4">
         <CanvasCell art={artToShow} onClick={() => onSelect(artToShow)} />
         <div className="flex gap-3 mt-4 items-center">
-          <img
-            className="w-14 h-14 rounded-lg"
-            src={artToShow.userId?.profilePhoto || "/defaultpicture.jpg"}
-            alt={artToShow.userId?.username || "Artist"}
-          />
+          <img className="w-14 h-14 rounded-lg" src={artToShow.userId?.profilePhoto || "/defaultpicture.jpg"} alt={artToShow.userId?.username || "Artist"} />
           <div className="flex flex-col text-white gap-1">
-            <p className="text-lg font-semibold">
-              {artToShow.userId?.username || "Unknown Artist"}
-            </p>
-            <p className="text-sm text-gray-400">
-              {artToShow.title || "Untitled"}
-            </p>
+            <p className="text-lg font-semibold">{artToShow.userId?.username || "Unknown Artist"}</p>
+            <p className="text-sm text-gray-400">{artToShow.title || "Untitled"}</p>
           </div>
         </div>
         <div className="flex items-center mt-4 space-x-4">
           <button
-            onClick={() =>
-              handleLike(
-                artToShow._id,
-                user,
-                likedArts,
-                setLikedArts,
-                likeCounts,
-                setLikeCounts
-              )
-            }
+            onClick={() => handleLike(artToShow._id, user, likedArts, setLikedArts, likeCounts, setLikeCounts)}
             className="flex items-center"
           >
-            {likedArts[artToShow._id] ? (
-              <FcLike className="text-xl" />
-            ) : (
-              <FcLikePlaceholder className="text-xl" />
-            )}
-            <span className="text-white ml-1 ">
-              {likeCounts[artToShow._id] || 0}
-            </span>
+            {likedArts[artToShow._id] ? <FcLike className="text-xl" /> : <FcLikePlaceholder className="text-xl" />}
+            <span className="text-white ml-1">{likeCounts[artToShow._id] || 0}</span>
           </button>
           <button
             onClick={async () => {
@@ -97,18 +76,11 @@ const FeaturedArt = ({
             }}
             className="text-white"
           >
-            {favorites[artToShow._id] ? (
-              <FaBookmark className="text-base" />
-            ) : (
-              <MdBookmarkBorder className="text-xl" />
-            )}
+            <div className="w-5 h-5 flex items-center justify-center">
+              {favorites[artToShow._id] ? <FaBookmark className="w-4 h-4" /> : <MdBookmarkBorder className="w-full h-full" />}
+            </div>
           </button>
-          <button
-            onClick={() => setShowReportModal(true)}
-            className="text-white"
-          >
-            Report
-          </button>
+          <button onClick={() => setShowReportModal(true)} className="text-white">Report</button>
         </div>
       </div>
       <ReportModal

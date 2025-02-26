@@ -5,18 +5,14 @@ import mongoose from "mongoose";
 
 const headers = {
   "Content-Type": "application/json",
-  "Access-Control-Allow-Origin": "http://localhost:3001",
+  "Access-Control-Allow-Origin": process.env.CORS_ORIGIN || "http://localhost:3001",
   "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
 
 async function verifyAdmin(req) {
   const token = req.headers.get("Authorization");
-  if (
-    !token ||
-    token !==
-      "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3OWM3ZjcyOTRkMGUxNjM3OWJjZjkwNCIsImVtYWlsIjoidHVndUBnbWFpbC5jb20iLCJpYXQiOjE3Mzg0ODQ4NDMsImV4cCI6MTczOTA4OTY0M30.L5rS82FrCNVkJaVQ4WgEHXobSd_7dFM1km4efcfFIIA"
-  ) {
+  if (!token || token !== process.env.ADMIN_BEARER_TOKEN) {
     return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
       headers,
@@ -64,6 +60,10 @@ export async function PUT(req) {
         { status: 400, headers }
       );
     }
+    await PixelArt.updateMany(
+      { winner: true, _id: { $ne: pixelArtId } },
+      { winner: false }
+    );
     const updatedPixelArt = await PixelArt.findByIdAndUpdate(
       pixelArtId,
       {

@@ -249,11 +249,13 @@ const Pursue = () => {
                       className="ml-4"
                       onClick={() => handleFavorite(art)}
                     >
+                      <div className="w-5 h-5 flex items-center justify-center">
                       {favorites[art._id] ? (
                         <FaBookmark className="text-md text-white" />
                       ) : (
                         <MdBookmarkBorder className="text-xl text-white" />
                       )}
+                      </div>
                     </button>
                     <button
                       className="text-white hover:text-yellow-400 transition-colors ml-auto"

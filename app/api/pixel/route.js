@@ -7,17 +7,22 @@ export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get("userId");
-    const page = Number(searchParams.get("page")) || 1;
-    const limit = 10;
-    const skip = (page - 1) * limit;
+    const limit = Number(searchParams.get("limit")) || 10;
     const filter = { status: "approved" };
-    if (userId) {
-      filter.userId = userId;
-    }
-    const userArts = await PixelArt.find(filter)
-      .populate("userId", "username email profession profilePhoto")
-      .skip(skip)
-      .limit(limit);
+    if (userId) filter.userId = userId;
+    const userArts = await PixelArt.aggregate([
+      { $match: filter },
+      { $sample: { size: limit } },
+      {
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "userId",
+        },
+      },
+      { $unwind: "$userId" },
+    ]);
     return NextResponse.json(userArts, { status: 200 });
   } catch (error) {
     return NextResponse.json(

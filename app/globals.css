@@ -12,3 +12,16 @@ body {
   background: white;
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@keyframes colorCycle {
+  0%, 100% {
+    color: #F97316; 
+  }
+  50% {
+    color: #FCD34D;
+  }
+}
+
+.animate-colorCycle {
+  animation: colorCycle 2s linear infinite;
+}

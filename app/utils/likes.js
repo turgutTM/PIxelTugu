@@ -9,11 +9,10 @@ export const fetchLikedArts = async (userId, setLikedArts, setLikeCounts) => {
     const newLikeCounts = {};
 
     data.forEach((like) => {
-      // Eğer like.userId tanımlı değilse işlemi atla
       if (!like?.userId) return;
 
       const likeUserId =
-        typeof like.userId === "object" && like.userId._id
+        typeof like?.userId === "object" && like?.userId._id
           ? like.userId._id.toString()
           : like.userId;
 

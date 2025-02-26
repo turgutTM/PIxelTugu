@@ -9,6 +9,13 @@ export default withUt({
   ],
   theme: {
     extend: {
+      keyframes: {
+        colorCycle: {
+          "0%, 100%": { color: "#F97316" }, 
+          "50%": { color: "#FCD34D" }, 
+        },
+      },
+
       fontFamily: {
         pixelify: ["'Pixelify Sans'", "sans-serif"],
         playwrite: ["'Playwrite IN'", "sans-serif"],
@@ -30,7 +37,8 @@ export default withUt({
       animation: {
         float: "float 5s infinite ease-in-out",
         bouncePixel: "bouncePixel 1.5s infinite",
-        grow: "grow 1s ease-out forwards", // Yeni animasyonumuz
+        grow: "grow 1s ease-out forwards",
+        colorCycle: "colorCycle 2s linear infinite",
       },
       keyframes: {
         float: {

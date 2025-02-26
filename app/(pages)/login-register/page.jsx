@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { MdInfoOutline } from "react-icons/md";
+
 
 const LoginRegister = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -9,7 +11,9 @@ const LoginRegister = () => {
     username: "",
     email: "",
     password: "",
+    confirmPassword: "",
   });
+  const [errorMessage, setErrorMessage] = useState("");
   const [squarePositions, setSquarePositions] = useState([]);
   const router = useRouter();
 
@@ -39,7 +43,14 @@ const LoginRegister = () => {
         body: JSON.stringify(formData),
       });
       const data = await response.json();
-      if (!response.ok) return;
+      if (!response.ok) {
+        if (endpoint === "/api/login") {
+          setErrorMessage("Wrong email or password");
+        } else if (endpoint === "/api/register") {
+          setErrorMessage("Mail is already exist");
+        }
+        return;
+      }
       if (
         (endpoint === "/api/login" || endpoint === "/api/register") &&
         data.token
@@ -47,10 +58,20 @@ const LoginRegister = () => {
         localStorage.setItem("token", data.token);
         router.push("/dashboard");
       }
-      setFormData({ username: "", email: "", password: "" });
+      setFormData({
+        username: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+      });
+      setErrorMessage("");
     } catch (error) {
       console.error("Error:", error);
-      alert("An error occurred. Please try again.");
+      if (endpoint === "/api/login") {
+        setErrorMessage("Wrong email or password");
+      } else if (endpoint === "/api/register") {
+        setErrorMessage("Mail is already exist");
+      }
     }
   };
 
@@ -70,6 +91,7 @@ const LoginRegister = () => {
           transition={{ duration: 0.4, ease: "easeInOut" }}
           style={{ display: "flex" }}
         >
+       
           <div className="w-[350px] md:w-[600px] h-[500px] flex flex-col items-center justify-center px-6 py-8">
             <h2 className="text-2xl md:text-3xl font-bold mb-6 text-pixelBlack">
               Login
@@ -94,6 +116,11 @@ const LoginRegister = () => {
                 onChange={handleInputChange}
                 className="mb-4 p-3 border border-pixelBlack rounded-lg focus:outline-none focus:ring-2 focus:ring-pixelPink"
               />
+              {errorMessage && isLogin && (
+                <p className="text-red-500 flex items-center gap-1 text-sm mb-4">
+                  <MdInfoOutline></MdInfoOutline>Wrong email or password
+                </p>
+              )}
               <button
                 type="submit"
                 className="bg-pixelPink hover:bg-pixelYellow text-pixelWhite font-semibold py-3 rounded-lg transition"
@@ -104,13 +131,17 @@ const LoginRegister = () => {
             <p className="text-sm text-pixelBlack mt-4">
               You have not any account yet?
               <span
-                onClick={() => setIsLogin(false)}
+                onClick={() => {
+                  setIsLogin(false);
+                  setErrorMessage("");
+                }}
                 className="ml-2 text-pixelBlue cursor-pointer hover:underline"
               >
                 Register here.
               </span>
             </p>
           </div>
+          
           <div className="w-[350px] md:w-[600px] h-[500px] flex flex-col items-center justify-center px-6 py-8">
             <h2 className="text-2xl md:text-3xl font-bold mb-6 text-pixelBlack">
               Register
@@ -143,6 +174,19 @@ const LoginRegister = () => {
                 onChange={handleInputChange}
                 className="mb-4 p-3 border border-pixelBlack rounded-lg focus:outline-none focus:ring-2 focus:ring-pixelGreen"
               />
+              <input
+                type="password"
+                name="confirmPassword"
+                placeholder="Confirm Password"
+                value={formData.confirmPassword}
+                onChange={handleInputChange}
+                className="mb-4 p-3 border border-pixelBlack rounded-lg focus:outline-none focus:ring-2 focus:ring-pixelGreen"
+              />
+              {errorMessage && !isLogin && (
+                <p className="text-red-500 flex items-center gap-1 text-sm mb-4">
+                  <MdInfoOutline></MdInfoOutline> Mail is already exist
+                </p>
+              )}
               <button
                 type="submit"
                 className="bg-pixelGreen hover:bg-pixelYellow text-pixelWhite font-semibold py-3 rounded-lg transition"
@@ -153,7 +197,10 @@ const LoginRegister = () => {
             <p className="text-sm text-pixelBlack mt-4">
               Already have an account?
               <span
-                onClick={() => setIsLogin(true)}
+                onClick={() => {
+                  setIsLogin(true);
+                  setErrorMessage("");
+                }}
                 className="ml-2 text-pixelBlue cursor-pointer hover:underline"
               >
                 Login here.

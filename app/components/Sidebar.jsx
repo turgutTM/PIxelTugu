@@ -87,7 +87,7 @@ export default function Sidebar() {
       </div>
       {showConfirmLogout && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-gray-800 p-4 rounded-3xl flex flex-col items-center space-y-4">
+          <div className="bg-gray-800 p-4 rounded-md  flex flex-col items-center space-y-4">
             <p>Are you sure you want to logout?</p>
             <div className="flex space-x-4">
               <button

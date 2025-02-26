@@ -12,6 +12,7 @@ import EditModal from "@/app/components/EditModal";
 import { getFollowingList, followUser, unfollowUser } from "@/app/utils/follow";
 import { removeFavorite } from "@/app/utils/save";
 import { toast } from "react-toastify";
+import { IoBookmark } from "react-icons/io5";
 export default function Profile() {
   const { userId } = useParams();
   const router = useRouter();
@@ -58,7 +59,7 @@ export default function Profile() {
     if (!targetUserId) return;
     (async () => {
       try {
-        const res = await fetch(`/api/pixel?userId=${targetUserId}`);
+        const res = await fetch(`/api/user-arts?userId=${targetUserId}`);
         if (!res.ok) throw new Error("Failed to fetch pixel arts");
         const data = await res.json();
         setPixelArts(data);
@@ -346,15 +347,18 @@ export default function Profile() {
             </p>
           </div>
         </div>
-        <div className="relative bg-gradient-to-r from-black to-orange-500 p-6 rounded-lg shadow-xl mt-6">
+        <div className="relative bg-gradient-to-r from-gray-800 to-gray-900 p-6 rounded-lg shadow-xl mt-6">
           {favoriteArt ? (
             <div>
+              <p className="text-center font-bold text-2xl mb-3">
+                User's favorite art
+              </p>
               <canvas
                 ref={favoriteCanvasRef}
                 className="w-full h-auto object-cover"
                 style={{ backgroundColor: "#fff", imageRendering: "pixelated" }}
               />
-              <h3 className="text-xl font-semibold mt-4 text-center">
+              <h3 className="text-xl font-semibold mt-4 ">
                 {favoriteArt.title || "Untitled"}
               </h3>
             </div>
@@ -394,7 +398,7 @@ export default function Profile() {
                   ref={(el) => (canvasRefs.current[index] = el)}
                   width={art.canvasSize || 110}
                   height={art.canvasSize || 110}
-                  className="block w-full h-32"
+                  className="block hover:scale(1.01) w-full h-32"
                   style={{
                     backgroundColor: "#fff",
                     imageRendering: "pixelated",
@@ -503,27 +507,35 @@ export default function Profile() {
                 </p>
               </div>
             </div>
-            <div className="absolute bottom-4 right-4 flex items-center gap-2">
-              {user?._id === profileUser?._id && (
-                <>
-                  <button
-                    onClick={() => {
-                      setSelectedPixelArtId(selectedLargePixelArt._id);
-                      setShowLargeModal(false);
-                      setShowPixelDeleteModal(true);
-                    }}
-                    className="text-white hover:text-red-500 duration-150"
-                  >
-                    <MdDeleteOutline size={24} />
-                  </button>
-                  <MdOutlineCoffeeMaker
-                    className="hover:text-blue-500 duration-150 cursor-pointer"
-                    size={24}
-                    onClick={handleCoffeeMakerClick}
-                  />
-                </>
-              )}
-            </div>
+            {!isFavoritesView && user?._id === profileUser?._id && (
+              <div className="absolute bottom-4 right-4 flex items-center gap-3">
+                <MdOutlineCoffeeMaker
+                  onClick={handleCoffeeMakerClick}
+                  className="hover:text-blue-500 duration-150 cursor-pointer"
+                  size={20}
+                />
+                <MdDeleteOutline
+                  onClick={() => {
+                    setShowPixelDeleteModal(true);
+                    setSelectedPixelArtId(selectedLargePixelArt._id);
+                  }}
+                  className="hover:text-red-500 duration-150 cursor-pointer"
+                  size={20}
+                />
+              </div>
+            )}
+            {isFavoritesView && (
+              <div className="absolute bottom-4 right-4 flex items-center gap-3">
+                <IoBookmark
+                  onClick={() => {
+                    handleRemoveFavorite(selectedLargePixelArt._id);
+                    setShowLargeModal(false);
+                  }}
+                  className="hover:text-red-500 duration-150 cursor-pointer"
+                  size={20}
+                />
+              </div>
+            )}
           </div>
         </div>
       )}
