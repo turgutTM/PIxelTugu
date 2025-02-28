@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 const Events = () => {
   const router = useRouter();
   return (
-    <div className="bg-gradient-to-bl from-red-500 via-black to-gray-900 min-h-screen p-6">
+    <div className="bg-gradient-to-r from-red-700 via-purple-900 to-pink-900 min-h-screen p-6">
       <header className="flex justify-center items-center mb-6">
         <h1 className="text-4xl font-bold text-white">Art Challenges</h1>
       </header>

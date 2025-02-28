@@ -13,6 +13,8 @@ import { getFollowingList, followUser, unfollowUser } from "@/app/utils/follow";
 import { removeFavorite } from "@/app/utils/save";
 import { toast } from "react-toastify";
 import { IoBookmark } from "react-icons/io5";
+import { LuPaintbrushVertical } from "react-icons/lu";
+
 export default function Profile() {
   const { userId } = useParams();
   const router = useRouter();
@@ -350,15 +352,15 @@ export default function Profile() {
         <div className="relative bg-gradient-to-r from-gray-800 to-gray-900 p-6 rounded-lg shadow-xl mt-6">
           {favoriteArt ? (
             <div>
-              <p className="text-center font-bold text-2xl mb-3">
-                User's favorite art
+              <p className="text-center font-bold flex items-center gap-1 text-2xl mb-3">
+               <LuPaintbrushVertical className="text-yellow-400"></LuPaintbrushVertical> User's favorite art
               </p>
               <canvas
                 ref={favoriteCanvasRef}
                 className="w-full h-auto object-cover"
                 style={{ backgroundColor: "#fff", imageRendering: "pixelated" }}
               />
-              <h3 className="text-xl font-semibold mt-4 ">
+              <h3 className="text-xl font-thin mt-4 ">
                 {favoriteArt.title || "Untitled"}
               </h3>
             </div>

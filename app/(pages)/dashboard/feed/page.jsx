@@ -12,6 +12,7 @@ import { fetchLikedArts, handleLike } from "@/app/utils/likes";
 import { getFollowingList, followUser, unfollowUser } from "@/app/utils/follow";
 import { addFavorite, removeFavorite } from "@/app/utils/save";
 import { TfiCup } from "react-icons/tfi";
+import { toast } from "react-toastify";
 
 export default function Feed() {
   const { ref: headingRef, inView: headingVisible } = useInView({
@@ -144,12 +145,14 @@ export default function Feed() {
   const handleFollow = async (followingId) => {
     if (!user?._id) return;
     await followUser(user._id, followingId);
+    toast.success("Followed")
     setFollowingUsers((prev) => ({ ...prev, [followingId]: true }));
   };
 
   const handleUnfollow = async (followingId) => {
     if (!user?._id) return;
     await unfollowUser(user._id, followingId);
+    toast.warn("Unfollowed")
     setFollowingUsers((prev) => {
       const updated = { ...prev };
       delete updated[followingId];
