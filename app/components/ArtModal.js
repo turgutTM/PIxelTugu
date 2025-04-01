@@ -14,79 +14,75 @@ const ArtModal = ({ selectedArt, onClose }) => {
       const modalSize = 380;
       modalCanvasRef.current.width = modalSize;
       modalCanvasRef.current.height = modalSize;
-      
-   
+
       const drawBackground = () => {
-    
         const gradient = ctx.createLinearGradient(0, 0, modalSize, modalSize);
         gradient.addColorStop(0, "#f9f7ff");
         gradient.addColorStop(1, "#f0f8ff");
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, modalSize, modalSize);
-        
-    
+
         ctx.fillStyle = "rgba(220, 220, 240, 0.5)";
         const dotSpacing = 15;
         const dotSize = 2;
-        
-        for (let x = dotSpacing/2; x < modalSize; x += dotSpacing) {
-          for (let y = dotSpacing/2; y < modalSize; y += dotSpacing) {
+
+        for (let x = dotSpacing / 2; x < modalSize; x += dotSpacing) {
+          for (let y = dotSpacing / 2; y < modalSize; y += dotSpacing) {
             ctx.beginPath();
-            ctx.arc(x, y, dotSize/2, 0, Math.PI * 2);
+            ctx.arc(x, y, dotSize / 2, 0, Math.PI * 2);
             ctx.fill();
           }
         }
       };
-      
+
       drawBackground();
-      
-     
+
       const originalSize = selectedArt.canvasSize || 110;
       const scale = modalSize / originalSize;
       const pixels = [...selectedArt.pixels];
-      
-     
+
       const centerX = originalSize / 2;
       const centerY = originalSize / 2;
       pixels.sort((a, b) => {
-        const distA = Math.sqrt(Math.pow(a.x - centerX, 2) + Math.pow(a.y - centerY, 2));
-        const distB = Math.sqrt(Math.pow(b.x - centerX, 2) + Math.pow(b.y - centerY, 2));
+        const distA = Math.sqrt(
+          Math.pow(a.x - centerX, 2) + Math.pow(a.y - centerY, 2)
+        );
+        const distB = Math.sqrt(
+          Math.pow(b.x - centerX, 2) + Math.pow(b.y - centerY, 2)
+        );
         return distA - distB;
       });
-      
-    
+
       let pixelIndex = 0;
       const drawNextBatch = () => {
         ctx.imageSmoothingEnabled = false;
         const batchSize = Math.ceil(pixels.length / 10);
         const endIndex = Math.min(pixelIndex + batchSize, pixels.length);
-        
+
         for (let i = pixelIndex; i < endIndex; i++) {
           const { x, y, color } = pixels[i];
           ctx.fillStyle = color;
           ctx.fillRect(x * scale, y * scale, scale, scale);
         }
-        
+
         pixelIndex = endIndex;
-        
+
         if (pixelIndex < pixels.length) {
           requestAnimationFrame(drawNextBatch);
         } else {
-       
           ctx.strokeStyle = "#9c88ff";
           ctx.lineWidth = 3;
           ctx.strokeRect(0, 0, modalSize, modalSize);
-          
-         
+
           ctx.strokeStyle = "rgba(0, 0, 0, 0.1)";
           ctx.lineWidth = 4;
           ctx.strokeRect(4, 4, modalSize - 8, modalSize - 8);
-          
+
           setIsLoading(false);
           setTimeout(() => setIsAnimating(false), 300);
         }
       };
-      
+
       setTimeout(drawNextBatch, 300);
     }
   }, [selectedArt]);
@@ -103,9 +99,10 @@ const ArtModal = ({ selectedArt, onClose }) => {
           isAnimating ? "scale-95 opacity-90" : "scale-100 opacity-100"
         }`}
         onClick={(e) => e.stopPropagation()}
-        style={{ 
-          boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1)",
-          background: "linear-gradient(145deg, #ffffff, #f5f7fa)"
+        style={{
+          boxShadow:
+            "0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1)",
+          background: "linear-gradient(145deg, #ffffff, #f5f7fa)",
         }}
       >
         <div className="relative mb-6">
@@ -130,11 +127,12 @@ const ArtModal = ({ selectedArt, onClose }) => {
             <canvas
               ref={modalCanvasRef}
               className="block mx-auto rounded-lg transition-all duration-500"
-              style={{ 
+              style={{
                 imageRendering: "pixelated",
                 opacity: isLoading ? 0.5 : 1,
                 transform: isLoading ? "scale(0.95)" : "scale(1)",
-                boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)"
+                boxShadow:
+                  "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
               }}
             />
           </div>

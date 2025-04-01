@@ -14,6 +14,7 @@ import { removeFavorite } from "@/app/utils/save";
 import { toast } from "react-toastify";
 import { IoBookmark } from "react-icons/io5";
 import { LuPaintbrushVertical } from "react-icons/lu";
+import { CgClose } from "react-icons/cg";
 
 export default function Profile() {
   const { userId } = useParams();
@@ -24,6 +25,7 @@ export default function Profile() {
   const [profileUser, setProfileUser] = useState(null);
   const [showMenu, setShowMenu] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showProfilePicture, setShowProfilePicture] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showPixelDeleteModal, setShowPixelDeleteModal] = useState(false);
   const [favoriteArt, setFavoriteArt] = useState(null);
@@ -189,6 +191,14 @@ export default function Profile() {
     }
   };
 
+  const openShowPicture = () => {
+    setShowProfilePicture(true); 
+  };
+
+  const closeShowPicture = () => {
+    setShowProfilePicture(false); 
+  }
+
   const openDeleteModal = () => {
     setShowDeleteModal(true);
     setShowMenu(false);
@@ -319,9 +329,12 @@ export default function Profile() {
       <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-r from-black via-gray-900 to-red-900 text-white">
         <div className="bg-gray-900 p-8 rounded-xl shadow-2xl">
           <h2 className="text-2xl font-bold mb-4">User Not Found</h2>
-          <p className="text-gray-400">The user profile you're looking for doesn't exist or has been removed.</p>
-          <button 
-            onClick={() => router.push('/')} 
+          <p className="text-gray-400">
+            The user profile you're looking for doesn't exist or has been
+            removed.
+          </p>
+          <button
+            onClick={() => router.push("/")}
             className="mt-6 px-6 py-2 bg-red-600 hover:bg-red-700 rounded-full transition-all duration-300"
           >
             Return Home
@@ -370,14 +383,24 @@ export default function Profile() {
               <RiUserFollowLine size={18} />
             </button>
           )}
-          <div className="flex flex-col sm:flex-row items-center gap-5">
+          <div className="flex flex-col relative sm:flex-row items-center gap-5">
             <div className="w-28 h-28 rounded-full overflow-hidden border-2 border-gray-700 shadow-lg">
               <img
+                onClick={openShowPicture}
                 src={profileUser.profilePhoto || "/defaultpicture.jpg"}
                 alt="Profile"
-                className="w-full h-full object-cover"
+                className="w-full h-full cursor-pointer object-cover"
               />
             </div>
+            {showProfilePicture && (
+              <div>
+                <img
+                  src={profileUser.profilePhoto || "/defaultpicture.jpg"}
+                  alt="Profile"
+                  className="w-12 h-12 rounded-full absolute justify-center items-center cursor-pointer object-cover border-2 border-gray-700"
+                />
+              </div>
+            )}
             <div className="text-center sm:text-left">
               <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-red-400 bg-clip-text text-transparent">
                 {profileUser?.username || "Unknown User"}
@@ -390,28 +413,40 @@ export default function Profile() {
           <div className="mt-5 text-gray-300 space-y-3 border-t border-gray-800 pt-4">
             <p className="flex flex-col">
               <span className="font-semibold text-red-400 text-sm">About</span>{" "}
-              <span className="ml-2 mt-1">{profileUser?.about || "No information provided"}</span>
+              <span className="ml-2 mt-1">
+                {profileUser?.about || "No information provided"}
+              </span>
             </p>
             <p className="flex flex-col">
               <span className="font-semibold text-red-400 text-sm">Study</span>{" "}
-              <span className="ml-2 mt-1">{profileUser?.study || "No information provided"}</span>
+              <span className="ml-2 mt-1">
+                {profileUser?.study || "No information provided"}
+              </span>
             </p>
             <p className="flex flex-col">
-              <span className="font-semibold text-red-400 text-sm">Contact</span>{" "}
-              <span className="ml-2 mt-1">{profileUser?.contact || "No information provided"}</span>
+              <span className="font-semibold text-red-400 text-sm">
+                Contact
+              </span>{" "}
+              <span className="ml-2 mt-1">
+                {profileUser?.contact || "No information provided"}
+              </span>
             </p>
             <p className="flex flex-col">
-              <span className="font-semibold text-red-400 text-sm">Followers</span>{" "}
-              <span className="ml-2 mt-1">{profileUser?.followersCount || 0}</span>
+              <span className="font-semibold text-red-400 text-sm">
+                Followers
+              </span>{" "}
+              <span className="ml-2 mt-1">
+                {profileUser?.followersCount || 0}
+              </span>
             </p>
           </div>
         </div>
-        
+
         <div className="relative bg-gradient-to-b from-gray-900 to-gray-800 p-6 rounded-2xl shadow-2xl border border-gray-800">
           {favoriteArt ? (
             <div>
               <h3 className="text-center font-bold flex items-center justify-center gap-2 text-xl mb-5">
-                <LuPaintbrushVertical className="text-yellow-400" size={20} /> 
+                <LuPaintbrushVertical className="text-yellow-400" size={20} />
                 <span className="bg-gradient-to-r from-yellow-400 to-red-400 bg-clip-text text-transparent">
                   Favorite Creation
                 </span>
@@ -420,7 +455,10 @@ export default function Profile() {
                 <canvas
                   ref={favoriteCanvasRef}
                   className="w-full h-auto object-cover"
-                  style={{ backgroundColor: "#fff", imageRendering: "pixelated" }}
+                  style={{
+                    backgroundColor: "#fff",
+                    imageRendering: "pixelated",
+                  }}
                 />
               </div>
               <h3 className="text-xl font-medium mt-4 text-center bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
@@ -435,12 +473,12 @@ export default function Profile() {
           )}
         </div>
       </div>
-      
+
       <div className="relative bg-gray-900 p-8 rounded-2xl shadow-2xl w-full md:w-2/3 transform transition-all duration-300 hover:shadow-red-900/50 border border-gray-800">
         <h2 className="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-white to-red-400 bg-clip-text text-transparent">
           {isFavoritesView ? "Favorite Collections" : "Pixel Creations"}
         </h2>
-        
+
         {targetUserId === user?._id && (
           <button
             className="absolute top-4 right-4 bg-gray-800 p-2 rounded-full hover:bg-gray-700 transition-all duration-300"
@@ -453,7 +491,7 @@ export default function Profile() {
             )}
           </button>
         )}
-        
+
         {(isFavoritesView && favArts.length > 0) ||
         (!isFavoritesView && pixelArts.length > 0) ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
@@ -492,8 +530,8 @@ export default function Profile() {
                 : "No Artworks Created Yet"}
             </p>
             {!isFavoritesView && user?._id === profileUser?._id && (
-              <button 
-                onClick={() => router.push('/create')} 
+              <button
+                onClick={() => router.push("/create")}
                 className="mt-4 px-6 py-2 bg-red-600 hover:bg-red-700 rounded-full transition-all duration-300"
               >
                 Create New Art
@@ -502,7 +540,7 @@ export default function Profile() {
           </div>
         )}
       </div>
-      
+
       <EditModal
         visible={showEditModal}
         onClose={() => setShowEditModal(false)}
@@ -511,15 +549,16 @@ export default function Profile() {
         onChange={handleEditChange}
         usernameLastChangedAt={profileUser.usernameLastChangedAt}
       />
-      
+
       {showDeleteModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 backdrop-blur-sm">
+        <div className="fixed inset-0 bg-black  bg-opacity-75 flex items-center justify-center z-50 backdrop-blur-sm">
           <div className="bg-gray-900 p-8 rounded-2xl shadow-2xl w-full max-w-md flex flex-col gap-4 border border-gray-800 transform transition-all duration-300 animate-fadeIn">
             <h2 className="text-2xl font-bold text-red-500">
               Delete Your Account
             </h2>
             <p className="text-gray-300">
-              This action will permanently remove all of your data and cannot be undone.
+              This action will permanently remove all of your data and cannot be
+              undone.
             </p>
             <p className="text-gray-300 font-medium">
               Are you sure you want to proceed?
@@ -541,15 +580,14 @@ export default function Profile() {
           </div>
         </div>
       )}
-      
+
       {showPixelDeleteModal && (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 backdrop-blur-sm">
           <div className="bg-gray-900 p-8 rounded-2xl shadow-2xl w-full max-w-md flex flex-col gap-4 border border-gray-800 transform transition-all duration-300 animate-fadeIn">
-            <h2 className="text-2xl font-bold text-red-500">
-              Delete Artwork
-            </h2>
+            <h2 className="text-2xl font-bold text-red-500">Delete Artwork</h2>
             <p className="text-gray-300">
-              This action will permanently remove this artwork from your collection.
+              This action will permanently remove this artwork from your
+              collection.
             </p>
             <p className="text-gray-300 font-medium">
               Are you sure you want to proceed?
@@ -571,14 +609,14 @@ export default function Profile() {
           </div>
         </div>
       )}
-      
+
       {showLargeModal && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 backdrop-blur-sm"
+          className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-40 backdrop-blur-sm"
           onClick={() => setShowLargeModal(false)}
         >
-          <div 
-            className="relative bg-gray-900 p-8 rounded-2xl shadow-2xl border border-gray-700 max-w-4xl transform transition-all duration-300 animate-scaleIn" 
+          <div
+            className="relative bg-gray-900 p-8 rounded-2xl shadow-2xl border border-gray-700 max-w-4xl transform transition-all duration-300 animate-scaleIn"
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -587,7 +625,7 @@ export default function Profile() {
             >
               &times;
             </button>
-            
+
             <div className="rounded-xl overflow-hidden shadow-2xl mb-6 border border-gray-800">
               <canvas
                 ref={largeCanvasRef}
@@ -595,13 +633,14 @@ export default function Profile() {
                 style={{ backgroundColor: "#fff", imageRendering: "pixelated" }}
               />
             </div>
-            
+
             <div className="flex items-center gap-4 border-t border-gray-800 pt-4">
               <img
                 src={profileUser.profilePhoto || "/defaultpicture.jpg"}
                 alt="Profile"
-                className="w-12 h-12 rounded-full object-cover border-2 border-gray-700"
+                className="w-12 h-12 rounded-full cursor-pointer object-cover border-2 border-gray-700"
               />
+
               <div>
                 <h3 className="text-xl font-bold text-white">
                   {profileUser?.username || "Unknown User"}
@@ -610,7 +649,7 @@ export default function Profile() {
                   {profileUser?.profession || "Artist"}
                 </p>
               </div>
-              
+
               {!isFavoritesView && user?._id === profileUser?._id && (
                 <div className="ml-auto flex items-center gap-4">
                   <button
@@ -632,7 +671,7 @@ export default function Profile() {
                   </button>
                 </div>
               )}
-              
+
               {isFavoritesView && (
                 <div className="ml-auto flex items-center gap-4">
                   <button
@@ -648,6 +687,32 @@ export default function Profile() {
                 </div>
               )}
             </div>
+          </div>
+        </div>
+      )}
+      {showProfilePicture && profileUser && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-85 flex items-center justify-center z-50 backdrop-blur-md p-4" 
+          onClick={closeShowPicture} 
+        >
+          <div
+            className="relative max-w-lg max-h-[80vh] w-auto h-auto" 
+            onClick={(e) => e.stopPropagation()} 
+          >
+       
+            <button
+              onClick={closeShowPicture}
+              className="absolute -top-2 -right-2 text-white bg-gray-800 bg-opacity-70 rounded-full p-1.5 hover:bg-opacity-100 transition-all duration-200 z-10"
+              aria-label="Close profile picture view"
+            >
+              <CgClose size={22} />
+            </button>
+         
+            <img
+              src={profileUser.profilePhoto || "/defaultpicture.jpg"}
+              alt={`${profileUser.username}'s Profile Picture`}
+              className="block w-full h-full object-contain rounded-lg shadow-2xl"  
+            />
           </div>
         </div>
       )}
