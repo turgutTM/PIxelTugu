@@ -323,8 +323,8 @@ export default function Feed() {
         </h2>
         <div style={{ height: "700px", overflowY: "auto", width: gridWidth }}>
           {loading && artworks.length === 0 ? (
-            <div className="flex justify-center items-center h-full">
-              <div className="border-t-4 border-white rounded-full w-12 h-12 animate-spin"></div>
+            <div className="flex justify-center items-center ">
+              <div className="border-t-4 border-white rounded-full  animate-spin"></div>
             </div>
           ) : (
             <Grid
@@ -347,7 +347,7 @@ export default function Feed() {
             <div className="flex justify-center items-center mt-4">
               <button
                 onClick={() => setPage((prev) => prev + 1)}
-                className="px-4 py-2 bg-white text-black rounded"
+                className="px-4 py-2 hover:bg-blue-500 hover:text-white duration-150 bg-white text-black rounded"
                 disabled={loading}
               >
                 Load More
